@@ -4,12 +4,14 @@ import * as api from "../../api";
 
 function* fetchScheduleSaga(action) {
     try {
-        const { day } = action.payload;
+        // const { day } = action.payload;
 
         yield put(actions.getSchedules.clearSchedules());
 
-        const schedule = yield call(api.fetchSchedule, day);
+        // const schedule = yield call(api.fetchSchedule, day);
+        const schedule = yield call(api.fetchSchedule);
         yield put(actions.getSchedules.getSchedulesSuccess(schedule.data));
+        yield delay(60000);
     } catch (error) {
         console.error("Error fetching schedule:", error);
     }
@@ -23,6 +25,7 @@ function* fetchScheduleSingleSaga(action) {
 
         const schedule = yield call(api.fetchScheduleSingle, id);
         yield put(actions.getScheduleSingle.getScheduleSingleSuccess(schedule.data));
+        yield delay(60000);
     } catch (error) {
         console.error("Error fetching schedule:", error);
     }

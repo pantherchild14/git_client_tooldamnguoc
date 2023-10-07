@@ -144,7 +144,6 @@ export default function MatchLive(props) {
           schedule={schedule}
         />
       </div>
-      match
     </div>
   );
 }

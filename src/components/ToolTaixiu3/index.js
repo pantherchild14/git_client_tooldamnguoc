@@ -45,69 +45,12 @@ const ToolTaiXiu3 = () => {
     useEffect(() => {
         const fetchData = async (date) => {
             await Promise.all([
-                dispatch(actions.getSchedules.getSchedulesRequest(date)),
+                dispatch(actions.getSchedules.getSchedulesRequest()),
                 dispatch(actions.getOdds.getOddsRequest()),
             ]);
         };
         fetchData(selectedDate);
     }, [selectedDate]);
-
-
-    // useEffect(() => {
-    //     var length = 0;
-    //     length = bfRefresh?.length || 0;
-
-    //     for (var i = 0; i < length; i++) {
-    //         var D;
-    //         D = bfRefresh?.[i]?.$;
-
-    //         if (!D) continue;
-    //         var tr = document.getElementById("tr_" + D.MATCH_ID);
-    //         if (tr === null) continue;
-    //         try {
-
-    //             var DHandicapJson = JSON.parse(D.ODDS_AH_FT);
-    //             var DOuJson = JSON.parse(D.ODDS_OU_FT);
-    //             /* Asian Handicap */
-    //             var upodds = tr.querySelector("#upodds_" + D.MATCH_ID);
-    //             var downodds = tr.querySelector("#downodds_" + D.MATCH_ID);
-    //             var goal = tr.querySelector("#goal_" + D.MATCH_ID);
-    //             var goalLive = tr.querySelector("#goalLive_" + D.MATCH_ID);
-
-
-    //             /* Over/Under */
-    //             var goal_t1 = tr.querySelector("#goal_t1_" + D.MATCH_ID);
-    //             var upodds_t = tr.querySelector("#upodds_t_" + D.MATCH_ID);
-    //             var downodds_t = tr.querySelector("#downodds_t_" + D.MATCH_ID);
-
-    //             updateElement(formatNumber(DHandicapJson.l.u), upodds);
-
-    //             updateElemenAttribute((DHandicapJson.l.g) < 0 ? (-DHandicapJson.l.g) : (-DHandicapJson.l.g), goal, "odd_goal")
-    //             updateElemenAttribute((DHandicapJson.l.g) < 0 ? (DHandicapJson.l.g) : (DHandicapJson.l.g), goalLive, "odd_goallive")
-
-
-    //             updateElement((DHandicapJson.l.g) < 0 ? "" : (DHandicapJson.l.g), goal);
-    //             updateElement((DHandicapJson.l.g) < 0 ? (-DHandicapJson.l.g) : "", goalLive);
-
-    //             updateElement(formatNumber(DHandicapJson.l.d), downodds);
-
-    //             updateElement(formatNumber(DOuJson.l.u), upodds_t);
-    //             updateElement((DOuJson.l.g), goal_t1);
-    //             updateElement(formatNumber(DOuJson.l.d), downodds_t);
-
-    //             function updateElement(newValue, element) {
-    //                 element.textContent = newValue;
-    //             }
-    //             function updateElemenAttribute(newValue, trElement, attributeName) {
-    //                 trElement.setAttribute(attributeName, newValue);
-    //             }
-    //         } catch (error) {
-    //             console.error("Error parsing JSON:", error);
-    //         }
-    //     }
-
-
-    // }, [bfRefresh])
 
     useEffect(() => {
         var length = 0;
@@ -282,92 +225,6 @@ const ToolTaiXiu3 = () => {
         }
     }, [oddRealTime])
 
-
-    useEffect(() => {
-        var length = 0;
-        length = schedulesEmit?.length || 0;
-
-        for (var i = 0; i < length; i++) {
-            var D;
-            D = schedulesEmit?.[i]?.$;
-            if (!D) continue;
-            let tr = document.getElementById("tr_" + D.MATCH_ID);
-            if (tr === null) continue;
-
-            try {
-                const startMatchTimer = () => {
-                    if (D.STATUS === undefined || D.HALF_START_TIME === undefined) {
-                        return;
-                    }
-
-                    const matchStartTimeInSeconds = parseInt(D.HALF_START_TIME);
-                    let ms = "";
-                    // Check if it's a valid timestamp (greater than 0) and not NaN
-                    if (isNaN(matchStartTimeInSeconds) || matchStartTimeInSeconds <= 0) {
-                        // Handle the case where D.HALF_START_TIME is missing or invalid
-                        // You can set ms to a default value or handle it as needed
-                        ms = "N/A"; // Set a default value or handle it accordingly
-                    } else {
-                        const currentTime = new Date();
-                        const matchStartTime = new Date(matchStartTimeInSeconds * 1000);
-
-                        // Calculate elapsed time in minutes
-                        const elapsedTimeMinutes = Math.floor((matchStartTime - currentTime) / 60000);
-
-
-                        const timeIcon = "<span class='in-gif'></span>";
-
-                        if (D.STATUS === 1) {
-                            if (elapsedTimeMinutes < 1) {
-                                ms = "1" + timeIcon;
-                            } else if (elapsedTimeMinutes > 45) {
-                                ms = "45+" + timeIcon;
-                            } else {
-                                ms = elapsedTimeMinutes + timeIcon;
-                            }
-                        } else if (D.STATUS === 3) {
-                            if (elapsedTimeMinutes < 46) {
-                                ms = "46" + timeIcon;
-                            } else if (elapsedTimeMinutes > 90) {
-                                ms = "90+" + timeIcon;
-                            } else {
-                                ms = elapsedTimeMinutes + timeIcon;
-                            }
-                        } else if (D.STATUS === 2) {
-                            ms = "HT";
-                        } else if (D.STATUS === 4) {
-                            ms = "ET";
-                        } else if (D.STATUS === 5) {
-                            ms = "Pen";
-                        }
-                    }
-
-                    const matchTimeElement = tr.querySelector(`#ms${D.MATCH_ID}`);
-                    const hsElement = tr.querySelector(`#hs${D.MATCH_ID}`);
-                    const gsElement = tr.querySelector(`#gs${D.MATCH_ID}`);
-                    if (ms !== "") {
-                        if (matchTimeElement) {
-                            matchTimeElement.innerHTML = ms;
-                        }
-                        if (hsElement) {
-                            hsElement.innerHTML = D.HOME_SCORE;
-                        }
-                        if (gsElement) {
-                            gsElement.innerHTML = D.AWAY_SCORE;
-                        }
-                    }
-
-                    setTimeout(startMatchTimer, 30 * 1000);
-                }
-
-                startMatchTimer();
-
-            } catch (error) {
-                console.error("Error parsing JSON:", error);
-            }
-        }
-    }, [schedulesEmit])
-
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -422,11 +279,6 @@ const ToolTaiXiu3 = () => {
 
         fetchData();
     }, []);
-
-
-    // if (schedule.data.length === 0 || odds.data.length === 0) {
-    //     return <div style={{ textAlign: 'center' }}><CircularProgress /></div>;
-    // }
 
 
     return (
@@ -575,15 +427,15 @@ const TableContent = ({ schedule,
                 <React.Fragment>
                     {sortedMatches.map((e) => {
                         const oddsItemData = odds.data?.ODDS_DATA?.ODDS_ITEM;
-                        const matchedOddsItem = oddsItemData?.find(item => item?.$?.MATCH_ID === e?.$.MATCH_ID);
+                        const matchedOddsItem = oddsItemData?.find(item => String(item?.$?.MATCH_ID) === String(e?.MATCH_ID));
 
                         const scheduleEmitItemData = schedulesEmit;
-                        const matchedScheduleEmitItem = scheduleEmitItemData?.find(item => item?.$?.MATCH_ID === e?.$.MATCH_ID);
+                        const matchedScheduleEmitItem = scheduleEmitItemData?.find(item => String(item?.$?.MATCH_ID) === String(e?.MATCH_ID));
 
                         if (matchedOddsItem) {
                             return <DataTable
-                                key={e.MATCH_ID}
-                                e={e?.$}
+                                key={e?.MATCH_ID}
+                                e={e}
                                 odds={matchedOddsItem}
                                 matchedScheduleEmitItem={matchedScheduleEmitItem?.$}
                                 selectedTips={selectedTips}

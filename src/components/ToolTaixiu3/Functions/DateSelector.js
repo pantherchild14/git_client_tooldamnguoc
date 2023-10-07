@@ -83,15 +83,6 @@ const funcTimeRun = (state, time) => {
     let goTime = "";
     const timeIcon = "<span class='in-gif'></span>";
 
-    // switch (STATE) {
-    //     case 5: ms = 'Pen.'; break; // Đá penalty
-    //     case 4: ms = 'ET'; break; // Thời gian bù giờ
-    //     case 3: ms = '2nd Half'; break; // Hiệp 2
-    //     case 2: ms = 'HT'; break; // Giữa hiệp
-    //     case 1: ms = '1st Half'; break; // Hiệp 1
-    //     default: ms = 'Unknown'; // Xử lý trạng thái không khớp
-    // }
-
     if (state === '1') {
         const currentTime = new Date();
         const elapsedTime = currentTime - new Date(time * 1000) - difftime;

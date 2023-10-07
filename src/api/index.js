@@ -6,7 +6,8 @@ const URL = `${process.env.REACT_APP_URL_SERVER}`;
 //     baseURL: "http://localhost:5000",
 // })
 
-export const fetchSchedule = (day) => axios.get(`${URL}/sport/football/schedule/${day}`);
+// export const fetchSchedule = (day) => axios.get(`${URL}/sport/football/schedule/${day}`);
+export const fetchSchedule = () => axios.get(`${URL}/sport/football/schedules`);
 
 export const fetchScheduleSingle = (id) => axios.get(`${URL}/sport/football/scheduleSingle/${id}`);
 

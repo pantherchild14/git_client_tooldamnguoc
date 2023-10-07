@@ -1,23 +1,113 @@
 import React, { useState, useEffect } from "react";
 
-const OU = (score) => {
-    if (score) {
-        const scoreParts = score.split('-');
-        if (scoreParts.length === 2) {
-            const beforeDash = parseInt(scoreParts[0], 10);
-            const afterDash = parseInt(scoreParts[1], 10);
-            const OU = beforeDash + afterDash;
-            if (OU >= 2.5) {
-                return "O";
-            } else {
-                return "U";
-            }
+const OU = (scoreHome, scoreAway, OU) => {
+    const home = parseInt(scoreHome, 10);
+    const away = parseInt(scoreAway, 10);
+    const ou = parseFloat(OU);
+
+    if (!isNaN(home) && !isNaN(away) && !isNaN(ou)) {
+        const totalscore = home + away;
+        if (ou < totalscore) {
+            return "O";
+        } else if (ou > totalscore) {
+            return "U";
+        } else {
+            return "D"
         }
     }
 };
 
+const handicap = (scoreHome, scoreAway, homeName, awayName, checkName) => {
+    const home = parseInt(scoreHome, 10);
+    const away = parseInt(scoreAway, 10);
+
+    if (checkName === homeName) {
+        if (home > away) {
+            return "W";
+        } else if (home < away) {
+            return "L";
+        } else {
+            return "D";
+        }
+    } else if (checkName === awayName) {
+        if (home < away) {
+            return "W";
+        } else if (home > away) {
+            return "L";
+        } else {
+            return "D";
+        }
+    }
+};
+
+const europe = (scoreHome, scoreAway, homeName, awayName, checkName, odd) => {
+    const home = parseInt(scoreHome, 10);
+    const away = parseInt(scoreAway, 10);
+
+    let totalScore;
+    if (odd > 0) {
+        totalScore = away + odd;
+        if (checkName === homeName) {
+            if (home > totalScore) {
+                return "W";
+            } else if (home < totalScore) {
+                return "L";
+            } else {
+                return "D";
+            }
+        } else if (checkName === awayName) {
+            if (home < totalScore) {
+                return "W";
+            } else if (home > totalScore) {
+                return "L";
+            } else {
+                return "D";
+            }
+        }
+    } else if (odd < 0) {
+        totalScore = home + odd;
+        if (checkName === homeName) {
+            if (totalScore > away) {
+                return "W";
+            } else if (totalScore < away) {
+                return "L";
+            } else {
+                return "D";
+            }
+        } else if (checkName === awayName) {
+            if (totalScore < away) {
+                return "W";
+            } else if (totalScore > away) {
+                return "L";
+            } else {
+                return "D";
+            }
+        }
+    } else if (odd === 0) {
+        if (checkName === homeName) {
+            if (home > away) {
+                return "W";
+            } else if (home < away) {
+                return "L";
+            } else {
+                return "D";
+            }
+        } else if (checkName === awayName) {
+            if (home < away) {
+                return "W";
+            } else if (home > away) {
+                return "L";
+            } else {
+                return "D";
+            }
+        }
+    }
+}
+
+
+
 const AwayAnalysis = (props) => {
-    const { awayTeam, title, LAST_MATCH_AWAY, LAST_MATCH_AWAY_IO } = props;
+    const { awayTeam, LAST_MATCH_AWAY } = props;
     const [showTable, setShowTable] = useState(false);
     const [activeFilter, setActiveFilter] = useState("");
     const [filteredData, setFilteredData] = useState([]);
@@ -32,16 +122,16 @@ const AwayAnalysis = (props) => {
 
     useEffect(() => {
         try {
-            let data;
-            if (LAST_MATCH_AWAY_IO) {
-                data = (LAST_MATCH_AWAY_IO);
-            } else {
-                data = LAST_MATCH_AWAY;
-            }
+            let data = LAST_MATCH_AWAY;
+
             setListData(data)
             const applyFilter = () => {
                 if (activeFilter === "Away") {
-                    setFilteredData(data.filter(e => e.Home === awayTeam));
+                    const filteredByHome = data.filter((e) => {
+                        const value = e.split(',');
+                        return value[6] === awayTeam;
+                    });
+                    setFilteredData(filteredByHome);
                 } else {
                     setFilteredData(data);
                 }
@@ -184,42 +274,73 @@ const AwayAnalysis = (props) => {
                                 </div>
                             </td>
                         </tr>
-                        <tr className="tr-title" align="center" height="25">
-                            <th width="2%">League/Cup</th>
-                            <th width="5%">Date</th>
-                            <th width="10%">Home</th>
-                            <th width="5%">Score</th>
-                            <th width="10%">Away</th>
+                        <tr className="tr-title" align="center" >
+                            <th width="5%" rowSpan={2}>League/Cup</th>
+                            <th width="5%" rowSpan={2}>Date</th>
+                            <th width="10%" rowSpan={2}>Home</th>
+                            <th width="5%" rowSpan={2}>Score</th>
+                            <th width="10%" rowSpan={2}>Away</th>
+                            <th width="2%" colSpan={4}>Handicap</th>
+                            <th width="2%" colSpan={4}>Europe</th>
+                            <th width="2%" colSpan={2}>Over/Under</th>
+                        </tr>
+                        <tr className="tr-title" align="center" >
+                            <th width="2%">HW</th>
+                            <th width="2%">D</th>
+                            <th width="2%">AW</th>
                             <th width="2%">W/L</th>
+                            <th width="2%">H</th>
+                            <th width="2%">AH</th>
+                            <th width="2%">A</th>
+                            <th width="2%">AH</th>
+                            <th width="2%">Total O/U</th>
                             <th width="2%">O/U</th>
                         </tr>
                         {showTable ? (
-                            Array.isArray(filteredData) ? (
-                                filteredData.slice(0, selectMatchCount).map((e, index) => (
-                                    <tr key={index} name="oddsTr" className="tb-bgcolor1" cid="8" style={{ textAlign: 'center' }}>
-                                        <td width="2%" height="30">{e.League}</td>
-                                        <td width="5%" height="30">{formatDate(e.Date)}</td>
-                                        <td width="10%" height="30" style={{ color: away(e.Home) }}>{e.Home}</td>
-                                        <td width="5%" height="30">
-                                            {e.Score && e.HalfScore ? (
+                            Array.isArray(filteredData) && filteredData.length > 0 ? (
+                                filteredData.slice(0, selectMatchCount).map((e, index) => {
+                                    const values = e.split(',');
+
+                                    return (
+                                        <tr key={index} name={`oddsTr_${index + 1}`} className="tb-bgcolor1" cid="8" style={{ textAlign: 'center' }}>
+                                            <td width="2%" height="30">{values[1]}</td>
+                                            <td width="5%" height="30">{formatDate(values[3] * 1000)}</td>
+                                            <td width="10%" height="30" style={{ color: away(values[4]) }}>{values[4]}</td>
+                                            <td width="5%" height="30">
                                                 <div>
-                                                    <span style={{ color: "red" }}>{e.Score}</span>({e.HalfScore})
+                                                    <span style={{ color: "red" }}>{values[8]}-{values[9]}</span>({values[10]}-{values[11]})
                                                 </div>
-                                            ) : (
-                                                '-'
-                                            )}
-                                        </td>
-                                        <td width="10%" height="30" style={{ color: away(e.Away) }}>{e.Away}</td>
-                                        <td width="2%" height="30" className="HW">
-                                            <span className={`o-${e.W_L}`}>{e.W_L}</span>
-                                        </td>
-                                        <td width="2%" height="30" className="HW">
-                                            <span className={`o-${OU(e.Score)}`}>
-                                                {OU(e.Score)}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))
+
+                                            </td>
+                                            <td width="10%" height="30" style={{ color: away(values[6]) }}>{values[6]}</td>
+                                            {/* Handicap  */}
+                                            <td width="2%" height="30">{values[19]}</td>
+                                            <td width="2%" height="30">{values[20]}</td>
+                                            <td width="2%" height="30">{values[21]}</td>
+                                            <td width="2%" height="30" >
+                                                <span className={`o-${handicap(values[8], values[9], values[4], values[6], awayTeam)}`}>
+                                                    {handicap(values[8], values[9], values[4], values[6], awayTeam)}
+                                                </span>
+                                            </td>
+                                            {/* Europe  */}
+                                            <td width="2%" height="30">{values[25]}</td>
+                                            <td width="2%" height="30">{values[26]}</td>
+                                            <td width="2%" height="30">{values[27]}</td>
+                                            <td width="2%" height="30" >
+                                                <span className={`o-${europe(values[8], values[9], values[4], values[6], awayTeam, values[26])}`}>
+                                                    {europe(values[8], values[9], values[4], values[6], awayTeam, values[26])}
+                                                </span>
+                                            </td>
+                                            {/* Over  */}
+                                            <td width="2%" height="30">{values[32]}</td>
+                                            <td width="2%" height="30" >
+                                                <span className={`o-${OU(values[8], values[9], values[32])}`}>
+                                                    {OU(values[8], values[9], values[32])}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
                             ) : (
                                 <tr>
                                     <td colSpan="12">No Data!</td>
@@ -227,31 +348,48 @@ const AwayAnalysis = (props) => {
                             )
                         ) : (
                             Array.isArray(filteredData) ? (
-                                filteredData.slice(0, selectMatchCount).map((e, index) => (
-                                    <tr key={index} name="oddsTr" className="tb-bgcolor1" cid="8" style={{ textAlign: 'center' }}>
-                                        <td width="2%" height="30">{e.League}</td>
-                                        <td width="5%" height="30">{formatDate(e.Date)}</td>
-                                        <td width="10%" height="30" style={{ color: away(e.Home) }}>{e.Home}</td>
-                                        <td width="5%" height="30">
-                                            {e.Score && e.HalfScore ? (
+                                filteredData.slice(0, selectMatchCount).map((e, index) => {
+                                    const values = e.split(',');
+                                    return (
+                                        <tr key={index} name={`oddsTr_${index + 1}`} className="tb-bgcolor1" cid="8" style={{ textAlign: 'center' }}>
+                                            <td width="2%" height="30">{values[1]}</td>
+                                            <td width="5%" height="30">{formatDate(values[3] * 1000)}</td>
+                                            <td width="10%" height="30" style={{ color: away(values[4]) }}>{values[4]}</td>
+                                            <td width="5%" height="30">
                                                 <div>
-                                                    <span style={{ color: "red" }}>{e.Score}</span>({e.HalfScore})
+                                                    <span style={{ color: "red" }}>{values[8]}-{values[9]}</span>({values[10]}-{values[11]})
                                                 </div>
-                                            ) : (
-                                                '-'
-                                            )}
-                                        </td>
-                                        <td width="10%" height="30" style={{ color: away(e.Away) }}>{e.Away}</td>
-                                        <td width="2%" height="30" className="HW">
-                                            <span className={`o-${e.W_L}`}>{e.W_L}</span>
-                                        </td>
-                                        <td width="2%" height="30" className="HW">
-                                            <span className={`o-${OU(e.Score)}`}>
-                                                {OU(e.Score)}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))
+
+                                            </td>
+                                            <td width="10%" height="30" style={{ color: away(values[6]) }}>{values[6]}</td>
+                                            {/* Handicap  */}
+                                            <td width="2%" height="30">{values[19]}</td>
+                                            <td width="2%" height="30">{values[20]}</td>
+                                            <td width="2%" height="30">{values[21]}</td>
+                                            <td width="2%" height="30" >
+                                                <span className={`o-${handicap(values[8], values[9], values[4], values[6], awayTeam)}`}>
+                                                    {handicap(values[8], values[9], values[4], values[6], awayTeam)}
+                                                </span>
+                                            </td>
+                                            {/* Europe  */}
+                                            <td width="2%" height="30">{values[25]}</td>
+                                            <td width="2%" height="30">{values[26]}</td>
+                                            <td width="2%" height="30">{values[27]}</td>
+                                            <td width="2%" height="30" >
+                                                <span className={`o-${europe(values[8], values[9], values[4], values[6], awayTeam, values[26])}`}>
+                                                    {europe(values[8], values[9], values[4], values[6], awayTeam, values[26])}
+                                                </span>
+                                            </td>
+                                            {/* Over  */}
+                                            <td width="2%" height="30">{values[32]}</td>
+                                            <td width="2%" height="30" >
+                                                <span className={`o-${OU(values[8], values[9], values[32])}`}>
+                                                    {OU(values[8], values[9], values[32])}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    )
+                                })
                             ) : (
                                 <tr>
                                     <td colSpan="12">No Data!</td>

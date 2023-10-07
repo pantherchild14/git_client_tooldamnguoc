@@ -21,6 +21,7 @@ const DataTable = (props) => {
         selectedTeamUp,
         selectedTipRun,
         selectedFilterTimeRun } = props;
+
     const dispatch = useDispatch();
     const [tipOU, setTipOU] = useState("");
     const [oddTipOU, setOddTipOU] = useState("");
@@ -35,7 +36,7 @@ const DataTable = (props) => {
     const handleViewClick = () => {
         dispatch(actions.getAnalysis.getAnalysisRequest(e.MATCH_ID));
         dispatch(actions.getDetail.getDetailRequest(e.MATCH_ID));
-        dispatch(actions.getStats.getStatsRequest('308908421'));
+        dispatch(actions.getStats.getStatsRequest(e.MATCH_ID));
         handleOpen();
     };
 
@@ -997,6 +998,8 @@ const DataTable = (props) => {
         }
     };
 
+
+
     const parsedOdds = oddsKeys.reduce((acc, key) => {
         acc[key] = parseJSON(odds.$[key]);
         return acc;
@@ -1016,11 +1019,9 @@ const DataTable = (props) => {
         }
 
     };
-
-    const matchTime = new Date(e.HALF_START_TIME * 1000);
+    const matchTime = new Date(matchedScheduleEmitItem?.HALF_START_TIME * 1000);
     matchTime.setHours(matchTime.getHours() + 7);
     const newTimestamp = matchTime.getTime() / 1000;
-
 
     return (
         <React.Fragment>
@@ -1053,7 +1054,7 @@ const DataTable = (props) => {
                         <div className="match_name">
 
                             <p id={`home_${e.MATCH_ID}`} className={((handicap?.INSTANT_HANDICAP) < 0 ? (-handicap?.INSTANT_HANDICAP) : (-handicap?.INSTANT_HANDICAP) ? `me_color` : "")}>
-                                {matchedScheduleEmitItem ? matchedScheduleEmitItem?.HOME_NAME : e.HOME_NAME}
+                                {e.HOME_NAME}
 
                                 {e.HOME_RANK ? (
                                     <span class="team-hg" style={{ marginLeft: '5px' }}>[{e.HOME_RANK}]<span></span></span>
@@ -1103,9 +1104,9 @@ const DataTable = (props) => {
 
                 <td width="5%" style={{ textAlign: 'center' }} className="td-score" id={`tdSrc_${e.MATCH_ID}`}>
                     <div>
-                        <span id={'hs' + e.MATCH_ID} className="blue">{e.HOME_SCORE}</span>
+                        <span id={'hs' + e.MATCH_ID} className="blue">{matchedScheduleEmitItem ? matchedScheduleEmitItem.HOME_SCORE : e.HOME_SCORE}</span>
                         <br />
-                        <span id={'ms' + e.MATCH_ID} dangerouslySetInnerHTML={{ __html: funcTimeRun(e.STATUS, newTimestamp) }}></span>
+                        <span id={'ms' + e.MATCH_ID} dangerouslySetInnerHTML={{ __html: funcTimeRun(matchedScheduleEmitItem?.STATUS, newTimestamp) }}></span>
                         <br />
                         <span id={'gs' + e.MATCH_ID} className="blue">{matchedScheduleEmitItem ? matchedScheduleEmitItem.AWAY_SCORE : e.AWAY_SCORE}</span>
                     </div>

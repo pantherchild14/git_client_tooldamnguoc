@@ -15,7 +15,6 @@ const Analysis = (props) => {
   const { analysis, schedule } = props;
 
 
-
   if (!analysis || !analysis.data || analysis.data.length === 0
     || !schedule || !schedule.data || schedule.data.length === 0) {
     return null;
@@ -34,7 +33,7 @@ const Analysis = (props) => {
       paddingBottom: '20px',
     },
   };
-
+  console.log(analysis);
   return (
     <>
       <H2H
@@ -45,26 +44,24 @@ const Analysis = (props) => {
         style={styles.paddingTop}
         H2H={analysis['data']['HEADTOHEAD']}
       />
-      {/* <Box sx={{ width: '100%' }}>
+      <Box sx={{ width: '100%' }}>
         <h2 style={styles.title}>Previous Scores Statistics</h2>
         <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-          <Grid item xs={6}>
+          <Grid item xs={12}>
             <HomeAnalysis
-              nameTeam={schedules.data.$.HOME_NAME}
+              nameTeam={schedule.data[0].HOME_NAME}
               title="Previous Scores Statistics"
-              LAST_MATCH_HOME={LAST_MATCH_HOME}
-              LAST_MATCH_HOME_IO={JSON.parse(h2hIO?.LAST_MATCH_HOME)}
+              LAST_MATCH_HOME={analysis['data']['HOME_LAST_MATCH']}
             />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12}>
             <AwayAnalysis
-              awayTeam={schedules.data.$.AWAY_NAME}
-              LAST_MATCH_AWAY={LAST_MATCH_AWAY}
-              LAST_MATCH_AWAY_IO={JSON.parse(h2hIO?.LAST_MATCH_AWAY)}
+              awayTeam={schedule.data[0].AWAY_NAME}
+              LAST_MATCH_AWAY={analysis['data']['AWAY_LAST_MATCH']}
             />
           </Grid>
         </Grid>
-      </Box> */}
+      </Box>
     </>
   );
 }

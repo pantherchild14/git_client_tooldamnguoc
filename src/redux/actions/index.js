@@ -4,8 +4,15 @@ export const getType = (reduxAction) => {
     return reduxAction().type;
 };
 
+// export const getSchedules = createActions({
+//     getSchedulesRequest: (day) => ({ day }),
+//     getSchedulesSuccess: (payload) => payload,
+//     getSchedulesFailure: (err) => err,
+//     clearSchedules: () => ({}),
+// });
+
 export const getSchedules = createActions({
-    getSchedulesRequest: (day) => ({ day }),
+    getSchedulesRequest: undefined,
     getSchedulesSuccess: (payload) => payload,
     getSchedulesFailure: (err) => err,
     clearSchedules: () => ({}),
