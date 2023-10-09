@@ -10,15 +10,15 @@ const HeaderMatch = (props) => {
         schedule,
     } = props;
 
-    if (!schedule || !schedule.data || schedule.data.length === 0) {
+    if (!schedule || !schedule?.data?.$ || schedule?.data?.$?.length === 0) {
         return null;
     }
 
-    const matchTime = new Date(schedule['data'][0].HALF_START_TIME * 1000);
+    const matchTime = new Date(schedule?.data?.$?.HALF_START_TIME * 1000);
     matchTime.setHours(matchTime.getHours() + 7);
     const newTimestamp = matchTime.getTime() / 1000;
 
-    const matchStatus = startMatchTimer(schedule['data'][0].STATUS, newTimestamp, "matchTime");
+    const matchStatus = startMatchTimer(schedule?.data?.$?.STATUS, newTimestamp, "matchTime");
 
 
     const styles = {
@@ -91,21 +91,21 @@ const HeaderMatch = (props) => {
             <Box gridColumn="span 8" textAlign={'center'} style={styles.midder}>
                 <Grid container spacing="auto">
                     <Grid style={styles.homeName} item xs={4}>
-                        <p>{schedule['data'][0].HOME_NAME}</p>
+                        <p>{schedule?.data?.$?.HOME_NAME}</p>
                     </Grid>
                     <Grid item xs={4}>
                         {/* ------------------ */}
                         <div style={styles.container}>
-                            <div style={styles.score}>{schedule['data'][0].HOME_SCORE}</div>
+                            <div style={styles.score}>{schedule?.data?.$?.HOME_SCORE}</div>
                             <div>
                                 <div id="matchTime" style={styles.matchTime} >
-                                    {schedule['data'][0].STATUS === 0 ? (
+                                    {schedule?.data?.$?.STATUS === 0 ? (
                                         <b>VS</b>
-                                    ) : schedule['data'][0].STATUS === 1 ? (
+                                    ) : schedule?.data?.$?.STATUS === 1 ? (
                                         <b>1st Half</b>
-                                    ) : schedule['data'][0].STATUS === 2 ? (
+                                    ) : schedule?.data?.$?.STATUS === 2 ? (
                                         <b>HT</b>
-                                    ) : schedule['data'][0].STATUS === 3 ? (
+                                    ) : schedule?.data?.$?.STATUS === 3 ? (
                                         <b>2nd Half</b>
                                     ) : (
                                         <b>FT</b>
@@ -113,12 +113,12 @@ const HeaderMatch = (props) => {
                                     {matchStatus && <div dangerouslySetInnerHTML={{ __html: matchStatus }} />}
                                 </div>
                             </div>
-                            <div style={styles.score}>{schedule['data'][0].AWAY_SCORE}</div>
+                            <div style={styles.score}>{schedule?.data?.$?.AWAY_SCORE}</div>
                         </div>
                         {/* ------------------ */}
                     </Grid>
                     <Grid style={styles.awayName} item xs={4}>
-                        <p>{schedule['data'][0].AWAY_NAME}</p>
+                        <p>{schedule?.data?.$?.AWAY_NAME}</p>
                     </Grid>
                 </Grid>
             </Box>
@@ -135,7 +135,7 @@ const HeaderMatch = (props) => {
                     </div>
                 </div>
             </Box>
-            <Box gridColumn="span 6">WHEATHER: {schedule['data'][0].WEATHER !== "" ? schedule['data'][0].WEATHER : "-"}</Box>
+            <Box gridColumn="span 6">WHEATHER: {schedule?.data?.$?.WEATHER !== "" ? schedule?.data?.$?.WEATHER : "-"}</Box>
             <Box gridColumn="span 10"></Box>
             <Box gridColumn="span 1" >
                 <Link

@@ -28,7 +28,7 @@ const DetailModal = (props) => {
             transform: 'translate(-50%, -50%)',
             borderRadius: '10px',
             overflow: 'hidden',
-            width: '800px',
+            width: '1000px',
             bgcolor: 'background.paper',
             boxShadow: 24,
             p: 1,

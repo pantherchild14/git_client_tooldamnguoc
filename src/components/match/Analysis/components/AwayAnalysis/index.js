@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 
 const OU = (scoreHome, scoreAway, OU) => {
-    const home = parseInt(scoreHome, 10);
-    const away = parseInt(scoreAway, 10);
+    const home = parseFloat(scoreHome, 10);
+    const away = parseFloat(scoreAway, 10);
     const ou = parseFloat(OU);
 
     if (!isNaN(home) && !isNaN(away) && !isNaN(ou)) {
@@ -17,32 +17,10 @@ const OU = (scoreHome, scoreAway, OU) => {
     }
 };
 
-const handicap = (scoreHome, scoreAway, homeName, awayName, checkName) => {
-    const home = parseInt(scoreHome, 10);
-    const away = parseInt(scoreAway, 10);
-
-    if (checkName === homeName) {
-        if (home > away) {
-            return "W";
-        } else if (home < away) {
-            return "L";
-        } else {
-            return "D";
-        }
-    } else if (checkName === awayName) {
-        if (home < away) {
-            return "W";
-        } else if (home > away) {
-            return "L";
-        } else {
-            return "D";
-        }
-    }
-};
-
-const europe = (scoreHome, scoreAway, homeName, awayName, checkName, odd) => {
-    const home = parseInt(scoreHome, 10);
-    const away = parseInt(scoreAway, 10);
+const handicap = (scoreHome, scoreAway, homeName, awayName, checkName, odds) => {
+    const home = parseFloat(scoreHome, 10);
+    const away = parseFloat(scoreAway, 10);
+    const odd = parseFloat(odds, 10);
 
     let totalScore;
     if (odd > 0) {
@@ -65,7 +43,7 @@ const europe = (scoreHome, scoreAway, homeName, awayName, checkName, odd) => {
             }
         }
     } else if (odd < 0) {
-        totalScore = home + odd;
+        totalScore = home + (-odd);
         if (checkName === homeName) {
             if (totalScore > away) {
                 return "W";
@@ -102,6 +80,29 @@ const europe = (scoreHome, scoreAway, homeName, awayName, checkName, odd) => {
             }
         }
     }
+};
+
+const europe = (scoreHome, scoreAway, homeName, awayName, checkName) => {
+    const home = parseFloat(scoreHome, 10);
+    const away = parseFloat(scoreAway, 10);
+
+    if (checkName === homeName) {
+        if (home > away) {
+            return "W";
+        } else if (home < away) {
+            return "L";
+        } else {
+            return "D";
+        }
+    } else if (checkName === awayName) {
+        if (home < away) {
+            return "W";
+        } else if (home > away) {
+            return "L";
+        } else {
+            return "D";
+        }
+    }
 }
 
 
@@ -116,8 +117,7 @@ const AwayAnalysis = (props) => {
     const [winCount, setWinCount] = useState(0);
     const [drawCount, setDrawCount] = useState(0);
     const [winOUCount, setWinOUCount] = useState(0);
-    const [total3MatchFirst, setTotal3MatchFirst] = useState(0);
-    const [total3MatchMedium, setTotal3MatchMedium] = useState(0);
+    const [winAHCount, setWinAHCount] = useState(0);
     const [selectMatchCount, setSelectMatchCount] = useState(10);
 
     useEffect(() => {
@@ -146,65 +146,45 @@ const AwayAnalysis = (props) => {
         let matchCount = 0;
         let winCount = 0;
         let drawCount = 0;
-        let totalOU = 0;
+
+        let winOU = 0;
+        let winAH = 0;
 
         const first10FilteredData = filteredData.slice(0, selectMatchCount);
 
-        first10FilteredData.forEach((data) => {
-            const tdValue = data.W_L;
-            const tdScore = data.Score;
+        first10FilteredData.map((e, index) => {
+            const values = e.split(',');
+            const tdMatchId = values[0];
+            const tdValueEU = europe(values[8], values[9], values[4], values[6], awayTeam);
 
-            if (tdValue) {
+            const tdValueAH = handicap(values[8], values[9], values[4], values[6], awayTeam, values[20]);
+            const tdValueOU = OU(values[8], values[9], values[32]);
+
+            if (tdMatchId) {
                 matchCount++;
             }
-            if (tdValue === 'W') {
+            if (tdValueEU === 'W') {
                 winCount++;
-            } else if (tdValue === 'D') {
+            } else if (tdValueEU === 'D') {
                 drawCount++;
             }
 
-            if (tdScore) {
-                const scoreParts = tdScore.split('-');
-                if (scoreParts.length === 2) {
-                    const beforeDash = parseInt(scoreParts[0], 10);
-                    const afterDash = parseInt(scoreParts[1], 10);
-                    const Over = beforeDash + afterDash;
-                    if (Over >= 2.5) {
-                        totalOU++;
-                    }
-                }
+            if (tdValueAH === 'W') {
+                winAH++;
             }
+            if (tdValueOU === 'O') {
+                winOU++;
+            }
+
         });
-        setWinOUCount(totalOU);
         setMatchCount(matchCount);
         setWinCount(winCount);
         setDrawCount(drawCount);
-    }, [filteredData]);
 
-    useEffect(() => {
-        try {
-            let totalScore3MatchFirstAllTeams = 0;
-            let totalScore3MatchFirstNameTeam = 0;
-            const first3FilteredDataAllTeams = filteredData.slice(0, 3);
-            first3FilteredDataAllTeams.forEach((data) => {
-                const tdValue = data.Score;
-                if (tdValue) {
-                    const scoreParts = tdValue.split('-');
-                    if (scoreParts.length === 2) {
-                        const beforeDash = parseInt(scoreParts[0], 10);
-                        const afterDash = parseInt(scoreParts[1], 10);
-                        totalScore3MatchFirstAllTeams += beforeDash + afterDash;
-                        totalScore3MatchFirstNameTeam += beforeDash / 3;
-                    }
-                }
-            });
+        setWinAHCount(winAH);
+        setWinOUCount(winOU);
+    }, [filteredData, selectMatchCount]);
 
-            setTotal3MatchFirst(totalScore3MatchFirstAllTeams);
-            setTotal3MatchMedium(totalScore3MatchFirstNameTeam);
-        } catch (error) {
-            console.error("Error parsing JSON data:", error.message);
-        }
-    }, [filteredData]);
 
     const formatDate = (timestamp) => {
         const date = new Date(timestamp);
@@ -280,8 +260,8 @@ const AwayAnalysis = (props) => {
                             <th width="10%" rowSpan={2}>Home</th>
                             <th width="5%" rowSpan={2}>Score</th>
                             <th width="10%" rowSpan={2}>Away</th>
-                            <th width="2%" colSpan={4}>Handicap</th>
                             <th width="2%" colSpan={4}>Europe</th>
+                            <th width="2%" colSpan={4}>Handicap</th>
                             <th width="2%" colSpan={2}>Over/Under</th>
                         </tr>
                         <tr className="tr-title" align="center" >
@@ -313,22 +293,22 @@ const AwayAnalysis = (props) => {
 
                                             </td>
                                             <td width="10%" height="30" style={{ color: away(values[6]) }}>{values[6]}</td>
-                                            {/* Handicap  */}
-                                            <td width="2%" height="30">{values[19]}</td>
-                                            <td width="2%" height="30">{values[20]}</td>
-                                            <td width="2%" height="30">{values[21]}</td>
-                                            <td width="2%" height="30" >
-                                                <span className={`o-${handicap(values[8], values[9], values[4], values[6], awayTeam)}`}>
-                                                    {handicap(values[8], values[9], values[4], values[6], awayTeam)}
-                                                </span>
-                                            </td>
                                             {/* Europe  */}
                                             <td width="2%" height="30">{values[25]}</td>
                                             <td width="2%" height="30">{values[26]}</td>
                                             <td width="2%" height="30">{values[27]}</td>
                                             <td width="2%" height="30" >
-                                                <span className={`o-${europe(values[8], values[9], values[4], values[6], awayTeam, values[26])}`}>
-                                                    {europe(values[8], values[9], values[4], values[6], awayTeam, values[26])}
+                                                <span className={`o-${europe(values[8], values[9], values[4], values[6], awayTeam)}`}>
+                                                    {europe(values[8], values[9], values[4], values[6], awayTeam)}
+                                                </span>
+                                            </td>
+                                            {/* Handicap  */}
+                                            <td width="2%" height="30">{values[19]}</td>
+                                            <td width="2%" height="30">{values[20]}</td>
+                                            <td width="2%" height="30">{values[21]}</td>
+                                            <td width="2%" height="30" >
+                                                <span className={`o-${handicap(values[8], values[9], values[4], values[6], awayTeam, values[20])}`}>
+                                                    {handicap(values[8], values[9], values[4], values[6], awayTeam, values[20])}
                                                 </span>
                                             </td>
                                             {/* Over  */}
@@ -362,22 +342,22 @@ const AwayAnalysis = (props) => {
 
                                             </td>
                                             <td width="10%" height="30" style={{ color: away(values[6]) }}>{values[6]}</td>
-                                            {/* Handicap  */}
-                                            <td width="2%" height="30">{values[19]}</td>
-                                            <td width="2%" height="30">{values[20]}</td>
-                                            <td width="2%" height="30">{values[21]}</td>
-                                            <td width="2%" height="30" >
-                                                <span className={`o-${handicap(values[8], values[9], values[4], values[6], awayTeam)}`}>
-                                                    {handicap(values[8], values[9], values[4], values[6], awayTeam)}
-                                                </span>
-                                            </td>
                                             {/* Europe  */}
                                             <td width="2%" height="30">{values[25]}</td>
                                             <td width="2%" height="30">{values[26]}</td>
                                             <td width="2%" height="30">{values[27]}</td>
                                             <td width="2%" height="30" >
-                                                <span className={`o-${europe(values[8], values[9], values[4], values[6], awayTeam, values[26])}`}>
-                                                    {europe(values[8], values[9], values[4], values[6], awayTeam, values[26])}
+                                                <span className={`o-${europe(values[8], values[9], values[4], values[6], awayTeam)}`}>
+                                                    {europe(values[8], values[9], values[4], values[6], awayTeam)}
+                                                </span>
+                                            </td>
+                                            {/* Handicap  */}
+                                            <td width="2%" height="30">{values[19]}</td>
+                                            <td width="2%" height="30">{values[20]}</td>
+                                            <td width="2%" height="30">{values[21]}</td>
+                                            <td width="2%" height="30" >
+                                                <span className={`o-${handicap(values[8], values[9], values[4], values[6], awayTeam, values[20])}`}>
+                                                    {handicap(values[8], values[9], values[4], values[6], awayTeam, values[20])}
                                                 </span>
                                             </td>
                                             {/* Over  */}
@@ -402,10 +382,9 @@ const AwayAnalysis = (props) => {
                                 {winCount} Win,
                                 {drawCount} Draw,
                                 {matchCount - (winCount + drawCount)} Loss,
-                                Win rate: <font className="red">{((winCount / matchCount) * 100).toFixed(1)}%</font>,
-                                Over rate: <font className="red">{((winOUCount / matchCount) * 100).toFixed(1)}%</font>,
-                                Total the goals: <font className="red">{total3MatchFirst}</font>,
-                                Total the average goals: <font className="red">{total3MatchMedium.toFixed(2)}</font>
+                                Win rate: <font class="red">{((winCount / matchCount) * 100).toFixed(1)}%</font>,
+                                AH rate: <font class="red">{((winAHCount / matchCount) * 100).toFixed(1)}%</font>,
+                                Over rate: <font class="red">{((winOUCount / matchCount) * 100).toFixed(1)}%</font>,
                             </td>
                         </tr>
                     </tbody>

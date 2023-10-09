@@ -675,3 +675,92 @@ div#caothu table thead tr.flexed1 {
     border-radius: 2px;
     margin: 0 2px;
 }
+
+.fx20 {
+    padding: 20px;
+    clear: both;
+    margin-bottom: 20px;
+}
+
+.stat {
+    overflow: hidden;
+    padding: 5px 0 20px 0;
+    text-align: center;
+}
+
+.stat li {
+    line-height: 18px;
+    padding: 0 15px;
+    margin-bottom: -1px;
+}
+
+li {
+    vertical-align: bottom;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+.stat-c {
+    display: inline-block;
+    width: 50px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.stat-bar {
+    display: inline-block;
+    height: 18px;
+    position: absolute;
+}
+
+.stat-bar-wrapper.homes {
+    border-radius: 3px 0 0 3px;
+}
+
+.stat-bar-wrapper {
+    display: inline-block;
+    position: relative;
+    background-color: #eaeaea;
+    width: 320px;
+    height: 18px;
+    overflow: hidden;
+    vertical-align: middle;
+}
+
+.stat .homes .stat-bar,
+.home-bg {
+    background-color: #e27a48;
+}
+
+.stat .aways .stat-bar,
+.away-bg {
+    background-color: #3f9ed8;
+}
+
+.stat-bar-wrapper.aways {
+    border-radius: 0 3px 3px 0;
+}
+
+.fr {
+    right: 0;
+}
+
+.fl {
+    left: 0;
+}
+
+.stat-title {
+    display: inline-block;
+    width: 140px;
+    text-align: center;
+    border: 1px solid #dcdcdc;
+    box-shadow: 1px 1px 6px #d6d6d6;
+    vertical-align: middle;
+    line-height: 30px;
+    background-color: #fff;
+    color: #666;
+}

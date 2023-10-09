@@ -427,15 +427,15 @@ const TableContent = ({ schedule,
                 <React.Fragment>
                     {sortedMatches.map((e) => {
                         const oddsItemData = odds.data?.ODDS_DATA?.ODDS_ITEM;
-                        const matchedOddsItem = oddsItemData?.find(item => String(item?.$?.MATCH_ID) === String(e?.MATCH_ID));
+                        const matchedOddsItem = oddsItemData?.find(item => String(item?.$?.MATCH_ID) === String(e?.$?.MATCH_ID));
 
                         const scheduleEmitItemData = schedulesEmit;
-                        const matchedScheduleEmitItem = scheduleEmitItemData?.find(item => String(item?.$?.MATCH_ID) === String(e?.MATCH_ID));
+                        const matchedScheduleEmitItem = scheduleEmitItemData?.find(item => String(item?.$?.MATCH_ID) === String(e?.$?.MATCH_ID));
 
                         if (matchedOddsItem) {
                             return <DataTable
                                 key={e?.MATCH_ID}
-                                e={e}
+                                e={e?.$}
                                 odds={matchedOddsItem}
                                 matchedScheduleEmitItem={matchedScheduleEmitItem?.$}
                                 selectedTips={selectedTips}

@@ -16,7 +16,7 @@ const Analysis = (props) => {
 
 
   if (!analysis || !analysis.data || analysis.data.length === 0
-    || !schedule || !schedule.data || schedule.data.length === 0) {
+    || !schedule || !schedule?.data?.$ || schedule?.data?.$?.length === 0) {
     return null;
   }
 
@@ -37,9 +37,9 @@ const Analysis = (props) => {
   return (
     <>
       <H2H
-        league={schedule.data[0].LEAGUE_SHORT_NAME}
-        nameTeam={schedule.data[0].HOME_NAME}
-        awayTeam={schedule.data[0].AWAY_NAME}
+        league={schedule?.data?.$?.LEAGUE_SHORT_NAME}
+        nameTeam={schedule?.data?.$?.HOME_NAME}
+        awayTeam={schedule?.data?.$?.AWAY_NAME}
         title="Head to Head Statistics"
         style={styles.paddingTop}
         H2H={analysis['data']['HEADTOHEAD']}
@@ -49,14 +49,14 @@ const Analysis = (props) => {
         <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
           <Grid item xs={12}>
             <HomeAnalysis
-              nameTeam={schedule.data[0].HOME_NAME}
+              nameTeam={schedule?.data?.$?.HOME_NAME}
               title="Previous Scores Statistics"
               LAST_MATCH_HOME={analysis['data']['HOME_LAST_MATCH']}
             />
           </Grid>
           <Grid item xs={12}>
             <AwayAnalysis
-              awayTeam={schedule.data[0].AWAY_NAME}
+              awayTeam={schedule?.data?.$?.AWAY_NAME}
               LAST_MATCH_AWAY={analysis['data']['AWAY_LAST_MATCH']}
             />
           </Grid>
